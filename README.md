@@ -6,9 +6,8 @@ The model was trained on photos of Red Bull and Mercedes cars.
 BolidVision/
 │
 ├── data/
-│   ├── raw/            # Raw data (e.g., CSV, JSON files)
-│   ├── processed/      # Processed data (e.g., data after cleaning, transformation)
-│   ├── external/       # External data (e.g., data downloaded from the internet)
+│   ├── raw/            # Raw data
+│   ├── processed/      # Processed data
 │
 ├── notebooks/           # Jupyter Notebooks or other notebooks
 │
