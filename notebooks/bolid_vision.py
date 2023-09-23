@@ -27,6 +27,9 @@ from lime import lime_image
 from skimage.segmentation import mark_boundaries
 from lime.lime_image import LimeImageExplainer
 
+from rembg import remove
+from tqdm import tqdm
+
 def create_datasets(train_path, test_path, batch_size=32, image_size=(224, 224), seed=42):
     """
     Create training, validation, and test datasets from image directories.
@@ -113,14 +116,14 @@ def display_images_from_dataset(dataset, num_images=6):
 
         plt.show()
 
-def create_and_train_vgg19_model(train_dataset, validation_dataset, epochs=20):
+def create_and_train_vgg19_model(train_dataset, validation_dataset, epochs=30):
     """
     Create and train a VGG19-based convolutional neural network model with data augmentation.
 
     Parameters:
     train_dataset (tf.data.Dataset): The training dataset.
     validation_dataset (tf.data.Dataset): The validation dataset.
-    epochs (int): Number of training epochs (default is 20).
+    epochs (int): Number of training epochs (default is 30).
 
     Returns:
     model (tf.keras.Model): The trained VGG19-based model.
@@ -157,13 +160,13 @@ def create_and_train_vgg19_model(train_dataset, validation_dataset, epochs=20):
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     # Define early stopping with patience of 4 epochs
-    earlystop = EarlyStopping(patience=4)
+    earlystop = EarlyStopping(patience=8, monitor="val_accuracy", verbose=1)
 
-    # Define learning rate reduction callback to monitor validation loss, reduce by a factor of 0.2, and set a minimum learning rate
-    learning_rate_reduction = ReduceLROnPlateau(monitor='val_loss',
+    # Define learning rate reduction callback to monitor validation loss, reduce by a factor of 0.5, and set a minimum learning rate
+    learning_rate_reduction = ReduceLROnPlateau(monitor='val_accuracy',
                                                 patience=4,
                                                 verbose=2,
-                                                factor=0.2,
+                                                factor=0.5,
                                                 min_lr=0.0001)
 
     # Combine both callbacks into a list
@@ -303,14 +306,13 @@ def display_and_predict_img(image_url, model, train_dataset, img_size=(224, 224)
         display(Image(img_path))
 
         # Preprocess the image for model input
-        preprocess_input = keras.applications.vgg16.preprocess_input
-        img_array = preprocess_input(get_img_array(img_path, img_size))
+        img_array = get_img_array(img_path, img_size)
 
         # Make predictions using the provided model
-        preds = model.predict(img_array)
+        prediction = model.predict(img_array)
 
         # Determine the predicted class based on the threshold
-        predicted_class = 1 if preds[0][0] > threshold else 0
+        predicted_class = 1 if prediction[0][0] > threshold else 0
 
         class_names = train_dataset.class_names
         predicted_label = class_names[predicted_class]
@@ -561,3 +563,50 @@ def visualize_explanation_heatmap(explanation):
     plt.imshow(heatmap, cmap='coolwarm', vmin=-heatmap.max(), vmax=heatmap.max())
     plt.colorbar()
     plt.show()
+
+def background_removal(images_with_bg_path, images_without_bg_path):
+    """
+    Process images in 'images_with_bg_path', removing their background and saving the results
+    in 'images_without_bg_path'.
+
+    Parameters:
+        images_with_bg_path (str): The path to the directory containing images with backgrounds.
+        images_without_bg_path (str): The path to the directory where processed images without backgrounds will be saved.
+
+    This function iterates through all the image files in 'images_with_bg_path', checks if they have
+    '.jpg' or '.png' extensions, and attempts to remove the background using the 'remove' function from the 'rembg' module.
+    The resulting images are converted to the RGB format and saved in the 'images_without_bg_path' directory.
+
+    If any errors occur during processing, such as file not found or image processing issues, they are caught,
+    and error messages are printed, allowing the function to continue processing other images.
+
+    If any other unexpected exceptions occur while creating directories or processing images,
+    a generic error message is printed.
+
+    Note: The 'remove' function used for background removal is from the 'rembg' module.
+
+    Returns:
+        None
+    """
+    try:
+        os.makedirs(images_without_bg_path, exist_ok=True)  # Create the destination directory if it doesn't exist
+
+        # Get a list of image files in the source directory
+        image_files = [filename for filename in os.listdir(images_with_bg_path) if filename.endswith('.jpg') or filename.endswith('.png')]
+
+        # Use tqdm to monitor progress
+        for filename in tqdm(image_files, desc="Processing images"):
+            input_path = os.path.join(images_with_bg_path, filename)
+            output_path = os.path.join(images_without_bg_path, filename)
+
+            try:
+                input_image = Image.open(input_path)
+                output_image = remove(input_image)
+                output_image = output_image.convert("RGB")
+                output_image.save(output_path)
+            except Exception as e:
+                print(f"Failed to process the file {input_path}: {str(e)}")
+
+        print("Finished removing backgrounds from images.")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
