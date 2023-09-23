@@ -3,7 +3,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
-def create_and_train_vgg19_model(train_dataset, validation_dataset, epochs=20):
+def create_and_train_vgg19_model(train_dataset, validation_dataset, epochs=30):
     """
     Create and train a VGG19-based convolutional neural network model with data augmentation.
 
@@ -47,10 +47,10 @@ def create_and_train_vgg19_model(train_dataset, validation_dataset, epochs=20):
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     # Define early stopping with patience of 4 epochs
-    earlystop = EarlyStopping(patience=4)
+    earlystop = EarlyStopping(patience=8, monitor='val_accuracy', verbose=1)
 
     # Define learning rate reduction callback to monitor validation loss, reduce by a factor of 0.2, and set a minimum learning rate
-    learning_rate_reduction = ReduceLROnPlateau(monitor='val_loss',
+    learning_rate_reduction = ReduceLROnPlateau(monitor='val_accuracy',
                                                 patience=4,
                                                 verbose=2,
                                                 factor=0.2,

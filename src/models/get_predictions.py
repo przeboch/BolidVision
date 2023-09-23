@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def get_predictions(model, dataset):
     """
     Get true labels and predicted labels for a given model and dataset.
