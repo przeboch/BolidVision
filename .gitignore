@@ -1,4 +1,6 @@
 *.ipynb_checkpoints
 *.h5
 *.keras
-*.pyc 
+*.pyc
+venv/
+ 
