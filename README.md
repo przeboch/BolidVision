@@ -6,21 +6,26 @@ The model was trained on photos of Red Bull and Mercedes cars.
 BolidVision/
 │
 ├── data/
-│   ├── raw/            # Raw data
-│   ├── processed/      # Processed data
+│   ├── raw/                     # Raw data
+|   ├── test_dataset/            # Data for testing model
+│   ├── processed/               # Processed data
+|   ├── model_explanations/      # LIME results
 │
-├── notebooks/           # Jupyter Notebooks or other notebooks
+├── notebooks/                   # Jupyter Notebooks or other notebooks
 │
-├── src/                 # Source code
-│   ├── data/            # Scripts for data acquisition, processing, and cleaning
-│   ├── features/        # Scripts for feature extraction
-│   ├── models/          # Scripts for model training and evaluation
-│   ├── visualization/   # Scripts for data visualization
+├── src/                         # Source code
+│   ├── data/                    # Scripts for data acquisition, processing, and cleaning
+│   ├── features/                # Scripts for feature extraction
+│   ├── models/                  # Scripts for model training and evaluation
+│   ├── visualization/           # Scripts for data visualization
+│   ├── functions_in_progress/   # Scripts for data visualization
 │
-├── config/               # Project configuration files (e.g., YAML or JSON files)
+├── models/                      # Project configuration files
 │
-├── reports/              # Project reports and documentation
+├── reports/                     # Project reports and documentation
 │
-├── requirements.txt      # Dependency list
+├── requirements.txt             # Dependency list
+|
+├── setup.py                     # Configuring and installing packages
 │
-├── README.md             # Project documentation
+├── README.md                    # Project documentation
