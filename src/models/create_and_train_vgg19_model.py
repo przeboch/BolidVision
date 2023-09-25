@@ -53,7 +53,7 @@ def create_and_train_vgg19_model(train_dataset, validation_dataset, epochs=30):
     learning_rate_reduction = ReduceLROnPlateau(monitor='val_accuracy',
                                                 patience=4,
                                                 verbose=2,
-                                                factor=0.2,
+                                                factor=0.5,
                                                 min_lr=0.0001)
 
     # Combine both callbacks into a list

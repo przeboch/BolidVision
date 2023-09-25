@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import PIL.Image
+import os
 
 
 def display_images_from_dataset(dataset, num_images=6):
@@ -86,4 +87,45 @@ def plot_confusion_matrix(true_labels, predicted_labels, class_labels=None):
     # Plot the confusion matrix
     disp.plot(cmap=plt.cm.Blues)
     plt.title('Confusion Matrix')
+    plt.show()
+
+
+def display_images_from_folder(folder, num_cols=3, num_to_display=None, show_titles=True):
+    """
+    Displays images from a folder on a dynamically adjusted layout.
+
+    :param folder: Path to the folder containing the images.
+    :param num_cols: Number of columns for the image display grid.
+    :param num_to_display: Number of images to display. If None, all images in the folder will be displayed.
+    :param show_titles: Whether to display titles for the images.
+    """
+    image_list = os.listdir(folder)
+
+    if num_to_display is not None:
+        image_list = image_list[:num_to_display]
+
+    num_images = len(image_list)
+
+    if num_images == 0:
+        print("No images found in the folder.")
+        return
+
+    # Calculate the number of rows based on the number of columns
+    num_rows = (num_images + num_cols - 1) // num_cols
+
+    # Create subplots
+    plt.figure(figsize=(4 * num_cols, 4 * num_rows))
+
+    for i, image_file in enumerate(image_list):
+        image_path = os.path.join(folder, image_file)
+        image = PIL.Image.open(image_path)
+
+        plt.subplot(num_rows, num_cols, i + 1)
+        plt.imshow(image)
+        plt.axis('off')
+
+        if show_titles:
+            plt.title(image_file)
+
+    plt.tight_layout()
     plt.show()
